@@ -3,9 +3,9 @@ const Workout = require("../models/workouts");
 const { title, reps, load } = Workout;
 
 exports.checkID = (req, res, next, val) => {
-  console.log(`Workout id is: ${val}`);
+  const id = req.params.id;
 
-  if (req.params.id * 1 > tours.length) {
+  if (mongoose.Types.ObjectId.IsValid(id)) {
     return res.status(404).json({
       status: "fail",
       message: "Invalid ID",
@@ -14,8 +14,14 @@ exports.checkID = (req, res, next, val) => {
   next();
 };
 
-exports.getWorkouts = (req, res) => {
+exports.getWorkouts = async (req, res) => {
   res.send({ mssg: "get all workouts" });
+  try {
+    const workouts = await Workout.find({}).sort({ createdAt: -1 });
+    res.status(200).json(workouts);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 exports.postWorkout = async (req, res) => {
@@ -30,14 +36,40 @@ exports.postWorkout = async (req, res) => {
   //   res.send({ mssg: "create workout" });
 };
 
-exports.getWorkout = (req, res) => {
-  res.send({ mssg: "get one workout" });
+exports.getWorkout = async (req, res) => {
+  const id = req.params.id;
+
+  const workout = await mongoose.findById(id);
+
+  if (!workout) {
+    return res.status(400).json({ error: "no workout found" });
+  }
+  res.status(200).json(workout);
 };
 
-exports.updateWorkout = (req, res) => {
-  res.send({ mssg: "update workout" });
+exports.updateWorkout = async (req, res) => {
+  const id = req.params.id;
+
+  const workout = await mongoose.findOneAndUpdate(
+    { _id: id },
+    {
+      ...req.body,
+    }
+  );
+
+  if (!workout) {
+    return res.status(400).json({ error: "no workout found" });
+  }
+  res.status(200).json(workout);
 };
 
-exports.deleteWorkout = (req, res) => {
-  res.send({ mssg: "delete workout" });
+exports.deleteWorkout = async (req, res) => {
+  const id = req.params.id;
+
+  const workout = await mongoose.findOneAndDelete({ _id: id });
+
+  if (!workout) {
+    return res.status(400).json({ error: "no workout found" });
+  }
+  res.status(200).json(workout);
 };
