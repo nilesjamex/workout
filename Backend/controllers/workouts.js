@@ -15,7 +15,7 @@ exports.checkID = (req, res, next, val) => {
 };
 
 exports.getWorkouts = async (req, res) => {
-  res.send({ mssg: "get all workouts" });
+  res.setHeader("Content-Type", "application/json");
   try {
     const workouts = await Workout.find({}).sort({ createdAt: -1 });
     res.status(200).json(workouts);
@@ -28,10 +28,17 @@ exports.postWorkout = async (req, res) => {
   const { title, reps, load } = req.body;
 
   try {
-    const workout = await Workout.create({ title, reps, load });
-    res.status(200).json(workout);
+    const workouts = await Workout.find({}).sort({ createdAt: -1 });
+
+    if (!workouts) {
+      return res.status(404).json({ message: "No workouts found" });
+    }
+
+    res.status(200).json(workouts);
   } catch (err) {
-    res.status(400).send({ mssg: "Invalid data sent" });
+    return res
+      .status(500)
+      .json({ message: "Error fetching workouts", error: error.message });
   }
   //   res.send({ mssg: "create workout" });
 };
