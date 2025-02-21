@@ -18,7 +18,7 @@ exports.login = async (req, res) => {
 
     res.status(200).json({ email, user, token });
   } catch (error) {
-    red.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
