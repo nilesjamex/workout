@@ -1,5 +1,6 @@
 const express = require("express");
 const Workouts = require("../controllers/workouts");
+const requireAuth = require("../middleware/requireAuth");
 
 const {
   getWorkouts,
@@ -13,6 +14,8 @@ const {
 const router = express.Router();
 
 // router.param("id", checkID);
+
+router.use(requireAuth);
 
 router.route("/").get(getWorkouts).post(postWorkout);
 
